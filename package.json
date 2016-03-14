@@ -1,0 +1,33 @@
+{
+  "name": "sdh-slackbot",
+  "version": "0.0.1-c",
+  "description": "Smart Developer Hub SlackBot",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Carlos Blanco Vallejo",
+    "email": "carlos.blanco@centeropenmiddleware.com",
+    "url": "https://github.com/cblanco"
+  },
+  "keywords": [
+    "bot",
+    "upm",
+    "com",
+    "sdh",
+    "smart",
+    "developer",
+    "hub",
+    "slack"
+  ],
+  "main": "sdhbot.js",
+  "dependencies": {
+    "botkit": "*",
+    "mkdirp": "*",
+    "moment": "^2.10.3",
+    "bunyan": "*",
+    "bunyan-prettystream": "*",
+    "request": "*",
+    "moment": "*",
+    "node-telegram-bot-api": "*",
+    "sdh-core-bot": "*"
+  }
+}
