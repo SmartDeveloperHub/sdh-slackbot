@@ -62,9 +62,16 @@
         pattern = pattern.substring(1, pattern.length-1);
         var newP = pattern.split("|");
         controller.hears(newP, type, function(bot, message) {
-            patternInfo.callback(message.user, message, function(coreResponse) {
-                genericSlackCalback(bot, message, pattern, coreResponse);
-            });
+            //TODO refact message
+            try {
+                patternInfo.callback(message.user, message, function(coreResponse) {
+                    // TODO
+                    genericSlackCalback(bot, message, pattern, coreResponse);
+                });
+            } catch(e) {
+                log.error(e);
+            }
+
         });
     };
 

@@ -22,12 +22,12 @@
   "dependencies": {
     "botkit": "*",
     "mkdirp": "*",
-    "moment": "^2.10.3",
+    "moment": "*",
     "bunyan": "*",
     "bunyan-prettystream": "*",
     "request": "*",
-    "moment": "*",
     "node-telegram-bot-api": "*",
-    "sdh-core-bot": "*"
+    "sdh-core-bot": "*",
+    "promise": "~7.1.1"
   }
 }
