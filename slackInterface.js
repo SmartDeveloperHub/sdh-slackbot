@@ -22,6 +22,7 @@
     // Bootkit or Slack Bots
     var Botkit = require('botkit');
     var os = require('os');
+    var patterns = require("./patterns")(sdhBot);
 
     GLOBAL.controller = Botkit.slackbot({
         debug: false
@@ -37,8 +38,8 @@
 
 
     module.exports.setListeners = function setListeners(callback){
-        for (var pattern in sdhBot.knownPatterns) {
-            generateSlackListener (pattern, 'direct_message', sdhBot.knownPatterns[pattern]);
+        for (var pattern in patterns) {
+            generateSlackListener (pattern, 'direct_message', patterns[pattern]);
         }
         callback();
     };
