@@ -105,7 +105,7 @@ var startBOT = function startBOT () {
 
         sdhBot.getSDHMembers(function(sdhMembers) {
             // Launching SlackBot
-            launchSlackBot(function() {
+            launchSlackBot(sdhBot, function() {
                 log.info('... slackbot Listenen! ...');
                 bot.getSlackMembers(function(slackMembers) {
                     log.info("SDH Members List:");
@@ -236,9 +236,9 @@ var startBOT = function startBOT () {
 
 };
 
-var launchSlackBot = function launchSlackBot (callback) {
+var launchSlackBot = function launchSlackBot (core, callback) {
     log.info('...loading slack bot interface ...');
-    bot = require("./slackInterface.js");
+    bot = require("./slackInterface.js")(core, log);
     bot.setListeners(function() {
         log.info('...slack interface ready...');
         callback();

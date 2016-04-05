@@ -26,83 +26,72 @@ module.exports = function(core) {
     //TODO: create a method to call the method for each pattern given the pattern and the variables in the pattern,
     // not all the text as it is now
 
-    var corePatterns = {
-        '/help/':{
-            'callback': core.ops.helpme,
-            'description': "Return core bot help information"
-        },
-        '/give me all metrics/':{
-            'callback': core.ops.allMetrics,
-            'description': "Return complete SDH metrics list"
-        },
-        '/give me metrics about [\\s\\S]+/':{
-            'callback': core.ops.allMetrics,
-            'description': "Return complete SDH metrics list"
-        },
-        '/give me [\\s\\S]+ metrics/':{
-            'callback': core.ops.getMetricsAbout,
-            'description': "Return complete SDH metrics list"
-        },
-        '/give me all views/':{
-            'callback': core.ops.allViews,
-            'description': "Return complete SDH views list"
-        },
-        '/give me all organizations/':{
-            'callback': core.ops.allOrgs,
-            'description': "Return complete SDH organizations list"
-        },
-        '/give me all products/':{
-            'callback': core.ops.allProducts,
-            'description': "Return complete SDH projects list"
-        },
-        '/give me all projects/':{
-            'callback': core.ops.allProjects,
-            'description': "Return complete SDH projects list"
-        },
-        '/give me all users|give me all members/':{
-            'callback': core.ops.allMembers,
-            'description': "Return complete SDH products list"
-        },
-        '/give me all repositories/':{
-            'callback': core.ops.allRepos,
-            'description': "Return complete SDH products list"
-        },
-        /*'/give me [\\s\\S]+ information/':{
-         'callback': allRepos,
-         'description': "Return complete SDH products list"
-         },*/
-        '/give me [\\s\\S]+ product':{
-            'callback': core.ops.product,
-            'description': "Return a SDH product"
-        },
-        '/give me [\\s\\S]+ project/':{
-            'callback': core.ops.project,
-            'description': "Return a SDH project"
-        },
-        '/give me [\\s\\S]+ user|give me [\\s\\S]+ member/':{
-            'callback': core.ops.member,
-            'description': "Return a SDH member"
-        },
-        '/give me [\\s\\S]+ repository|give me [\\s\\S]+ repo/':{
-            'callback': core.ops.repo,
-            'description': "Return a SDH repository"
-        },
-        '/give me [\\s\\S]+ metric/':{
-            'callback': core.ops.metric,
-            'description': "Return SDH metric data"
-        },
-        '/give me [\\s\\S]+ view/':{
-            'callback': core.ops.view,
-            'description': "Return SDH view data"
-        },
-        //'/[a-zA-Z]+/':{
-        /*'/[\\s\\S]/':{
-         'callback': sdhParser,
-         'description': "Return elastic matching info"
-         }*/
-    };
+    // Return core bot help information
+    core.registerDirective(/help/i, core.ops.helpme);
 
-    return corePatterns;
+    // Return complete SDH metrics list
+    core.registerDirective(/give me all metrics/i, core.ops.allMetrics);
+
+    // Return SDH metric
+    core.registerDirective(/give me metrics about ([\s\S]+)/i, core.ops.getMetricsAbout, [0]);
+    core.registerDirective(/give me ([\s\S]+) metrics/i, core.ops.getMetricsAbout, [0]);
+
+    // Return complete SDH views list
+    core.registerDirective(/give me all views/i, core.ops.allViews);
+
+    // Return complete SDH organizations list
+    core.registerDirective(/give me all organizations/i, core.ops.allOrgs);
+
+    // Return complete SDH products list
+    core.registerDirective(/give me all products/i, core.ops.allProducts);
+
+    // Return complete SDH projects list
+    core.registerDirective(/give me all projects/i, core.ops.allProjects);
+
+    // Return complete SDH members list
+    core.registerDirective(/give me all (?:users|members)/i, core.ops.allMembers);
+
+    // Return complete SDH repositories list
+    core.registerDirective(/give me all repos(?:itories)?/i, core.ops.allRepos);
+
+    // Return a SDH product
+    core.registerDirective(/give me ([\s\S]+) product/i, core.ops.product, [0]);
+
+    // Return a SDH project
+    core.registerDirective(/give me ([\s\S]+) project/i, core.ops.project, [0]);
+
+    // Return a SDH member
+    core.registerDirective(/give me ([\s\S]+) (?:user|member)/i, core.ops.member, [0]);
+
+    // Return a SDH repository
+    core.registerDirective(/give me ([\s\S]+) repo(?:sitory)?/i, core.ops.repo, [0]);
+
+    // Return a SDH metric data
+    core.registerDirective(/give me ([\s\S]+) metric/i, core.ops.metric, [0]);
+
+    // Return a SDH view data
+    core.registerDirective(/give me ([\s\S]+) view/i, core.ops.view, [0]);
+
+
+    //var corePatterns = {
+    //    '/help/':{
+    //        'callback': core.ops.helpme,
+    //        'description': "Return core bot help information"
+    //    },
+    //    /*'/give me [\\s\\S]+ information/':{
+    //     'callback': allRepos,
+    //     'description': "Return complete SDH products list"
+    //     },*/
+    //    //'/[a-zA-Z]+/':{
+    //    /*'/[\\s\\S]/':{
+    //     'callback': sdhParser,
+    //     'description': "Return elastic matching info"
+    //     }*/
+    //};
+    //
+    //return corePatterns;
+
+    return {};
 
 
 };
