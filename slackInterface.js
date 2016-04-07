@@ -27,6 +27,7 @@ module.exports = function(core, log) {
 
     // Bootkit or Slack Bots
     var Botkit = require('botkit');
+    var Promise = require('promise');
     var os = require('os');
     var patterns = require("./patterns")(sdhBot);
 
@@ -39,15 +40,28 @@ module.exports = function(core, log) {
     }).startRTM();
 
 
-
-    //var a = sdhBot.getSDHMembers(function(data) {slog.info(data)});
-
-
     _exports.setListeners = function setListeners(callback){
-        /*for (var pattern in patterns) {
-         generateSlackListener (pattern, 'direct_message', patterns[pattern]);
-         }*/
-        generateSlackListener ('/.*/', 'direct_message');
+
+        controller.on('direct_message', function(bot, message) {
+
+            replaceSlackIds(message.text).then(function(text) {
+
+                try {
+                    sdhBot.handleMessage(text, function(err, coreResponse) {
+                        if(err) {
+                            log.error(err);
+                        } else {
+                            genericSlackCallback(bot, message, coreResponse);
+                        }
+                    });
+                } catch(e) {
+                    log.error(e);
+                }
+
+            });
+
+        });
+
         callback();
     };
 
@@ -61,34 +75,81 @@ module.exports = function(core, log) {
         })
     };
 
-    controller.hears(['demo'], 'direct_message', function(bot, message) {
-        log.info("DEMO");
-        bot.reply(message, "All people love demos " + message.user + "...");
-    });
+    var replaceSlackIds = function(text) {
 
-    var generateSlackListener = function generateSlackListener (pattern, type, patternInfo) {
-        pattern = pattern.substring(1, pattern.length-1);
-        var newP = pattern.split("|");
-        controller.hears(newP, type, function(bot, message) {
-            //TODO refact message
-            try {
-                sdhBot.handleMessage(message.text, function(coreResponse) {
-                    // TODO
-                    genericSlackCalback(bot, message, pattern, coreResponse);
-                });
-                /*patternInfo.callback(message.user, message, function(coreResponse) {
-                 // TODO
-                 genericSlackCalback(bot, message, pattern, coreResponse);
-                 });*/
-            } catch(e) {
-                log.error(e);
+        var getUserInfo = Promise.denodeify(bot.api.users.info);
+
+        var userRegex = /<@(\S+)>/ig;
+        var resultPromises = [];
+        var m;
+        do {
+            m = userRegex.exec(text);
+            if (m) {
+                resultPromises.push(getUserInfo({user: m[1]}));
+            }
+        } while (m);
+
+        return Promise.all(resultPromises).then(function(userInfos) {
+
+            if(userInfos.length > 0) {
+                var slackIdMappings = {};
+                var getSdhMembers = Promise.denodeify(core.getSDHMembers);
+
+                return getSdhMembers().then(function(sdhMembers) {
+                    for(var u = 0; u < userInfos.length; u++) {
+                        var slackUser = userInfos[u].user;
+                        var perfectMatch = false;
+                        for(var m = 0; m < sdhMembers.length; m++) {
+                            var sdhUser = sdhMembers[m];
+                            if(slackUser.name == sdhUser.nick) { //Perfect match, set the sdhid
+                                slackIdMappings[slackUser.id] = "sdhid:" + sdhUser.userid;
+                                perfectMatch = true;
+                                break;
+                            }
+                        }
+
+                        // Not a perfect match. Try to find some information to put instead of the slack id
+                        if(!perfectMatch) {
+                            if(slackUser.profile.real_name) {
+                                slackIdMappings[slackUser.id] = slackUser.profile.real_name;
+                            } else if(slackUser.profile.first_name && slackUser.profile.last_name) {
+                                slackIdMappings[slackUser.id] = slackUser.profile.first_name + " " + slackUser.profile.last_name;
+                            } else if(slackUser.profile.email) {
+                                slackIdMappings[slackUser.id] = slackUser.profile.email;
+                            } else {
+                                slackIdMappings[slackUser.id] = slackUser.name;
+                            }
+
+                        }
+
+                    }
+
+                    return slackIdMappings;
+                })
+            } else {
+                return {};
             }
 
+        }).then(function(userAsocs) {
+            for(var slackId in userAsocs) {
+                if(userAsocs.hasOwnProperty(slackId)) {
+                    text = text.replace(new RegExp("<@"+slackId+">", 'g'), userAsocs[slackId]);
+                }
+            }
+
+            return text;
         });
+
     };
 
-    var genericSlackCalback = function genericSlackCalback(bot, message, pattern, coreResponse) {
-        bot.reply(message,JSON.stringify(coreResponse));
+
+    var genericSlackCallback = function genericSlackCallback(bot, message, coreResponse) {
+        if(typeof coreResponse === 'string') {
+            bot.reply(message, coreResponse);
+        } else {
+            bot.reply(message, JSON.stringify(coreResponse));
+        }
+
     };
 
     /*// reply to @bot hello
