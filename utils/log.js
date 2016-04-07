@@ -19,11 +19,16 @@
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=#
 */
 
-var Promise = require('promise');
+var Promise = require('bluebird');
 var bunyan = require('bunyan');
 var PrettyStream = require('bunyan-prettystream');
 var getDirName = require("path").dirname;
-var mkdirp = Promise.denodeify(require("mkdirp"));
+var mkdirp = Promise.promisify(require("mkdirp"));
+
+// Do not silently capture errors
+Promise.onPossiblyUnhandledRejection(function(error){
+    throw error;
+});
 
 module.exports = function(path, level, period, nfiles) {
 

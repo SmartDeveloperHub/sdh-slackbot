@@ -20,17 +20,10 @@
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=#
 */
 
-var loadStartDate = new Date();
 var log = null;
 
 var init = function() {
-    try {
-        // global buyan
-        const bunyan = require('bunyan');
-        const PrettyStream = require('bunyan-prettystream');
-    } catch (err) {
-        console.error("Bot Error. bunyan logs problem: " + err);
-    }
+
     try {
         // Set Config params
         require('./config');
@@ -40,6 +33,15 @@ var init = function() {
             process.exit(0);
         }, 1000);
     }
+
+    require('./utils/log')(FILE_LOG_PATH, FILE_LOG_LEVEL, FILE_LOG_PERIOD, FILE_LOG_NFILES).then(function (_log) {
+        log = _log;
+        startBOT();
+    });
+};
+
+
+var startBOT = function startBOT () {
 
     // Shut down function
     var gracefullyShuttinDown = function gracefullyShuttinDown() {
@@ -64,14 +66,6 @@ var init = function() {
         return;
     }
 
-    require('./utils/log')(FILE_LOG_PATH, FILE_LOG_LEVEL, FILE_LOG_PERIOD, FILE_LOG_NFILES).then(function (_log) {
-        log = _log;
-        startBOT();
-    });
-};
-
-
-var startBOT = function startBOT () {
     log.info("... Loading Modules...");
     try {
         GLOBAL.moment = require("moment");
@@ -91,29 +85,18 @@ var startBOT = function startBOT () {
     require('sdh-core-bot')("<@USLACKBOT>", 'https://sdh.conwet.fi.upm.es/sdhapi', 'https://sdh.conwet.fi.upm.es/', corelog).then(function(sdhBot) {
 
         GLOBAL.sdhBot = sdhBot;
+        launchSlackBot(sdhBot);
 
-        sdhBot.getSDHMembers(function(sdhMembers) {
-            // Launching SlackBot
-            launchSlackBot(sdhBot, function() {
-                log.info('... slackbot Listenen! ...');
-                bot.getSlackMembers(function(slackMembers) {
-
-
-                });
-            });
-        });
-
+        log.info('... slackbot Listening! ...');
     });
 
 };
 
-var launchSlackBot = function launchSlackBot (core, callback) {
+var launchSlackBot = function launchSlackBot (core) {
     log.info('...loading slack bot interface ...');
     bot = require("./slackInterface.js")(core, log);
-    bot.setListeners(function() {
-        log.info('...slack interface ready...');
-        if(typeof callback === 'function') callback();
-    });
+    bot.setListeners();
+    log.info('...slack interface ready...');
 };
 
 init();

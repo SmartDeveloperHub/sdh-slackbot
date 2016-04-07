@@ -19,17 +19,17 @@
      limitations under the License.
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=#
 */
+var Botkit = require('botkit');
+var Promise = require('bluebird');
+
+// Do not silently capture errors
+Promise.onPossiblyUnhandledRejection(function(error){
+    throw error;
+});
 
 module.exports = function(core, log) {
 
-
     var _exports = {};
-
-    // Bootkit or Slack Bots
-    var Botkit = require('botkit');
-    var Promise = require('promise');
-    var os = require('os');
-    var patterns = require("./patterns")(sdhBot);
 
     GLOBAL.controller = Botkit.slackbot({
         debug: false
@@ -40,7 +40,10 @@ module.exports = function(core, log) {
     }).startRTM();
 
 
-    _exports.setListeners = function setListeners(callback){
+    _exports.setListeners = function setListeners() {
+
+        // Register directives in the core
+        require("./patterns")(sdhBot);
 
         controller.on('direct_message', function(bot, message) {
 
@@ -62,7 +65,6 @@ module.exports = function(core, log) {
 
         });
 
-        callback();
     };
 
     _exports.getSlackMembers = function getSlackMembers(callback) {
@@ -77,7 +79,7 @@ module.exports = function(core, log) {
 
     var replaceSlackIds = function(text) {
 
-        var getUserInfo = Promise.denodeify(bot.api.users.info);
+        var getUserInfo = Promise.promisify(bot.api.users.info);
 
         var userRegex = /<@(\S+)>/ig;
         var resultPromises = [];
@@ -93,7 +95,7 @@ module.exports = function(core, log) {
 
             if(userInfos.length > 0) {
                 var slackIdMappings = {};
-                var getSdhMembers = Promise.denodeify(core.getSDHMembers);
+                var getSdhMembers = Promise.promisify(core.getSDHMembers);
 
                 return getSdhMembers().then(function(sdhMembers) {
                     for(var u = 0; u < userInfos.length; u++) {
