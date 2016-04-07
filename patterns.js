@@ -23,9 +23,6 @@
 
 module.exports = function(core) {
 
-    //TODO: create a method to call the method for each pattern given the pattern and the variables in the pattern,
-    // not all the text as it is now
-
     // Return core bot help information
     core.registerDirective(/help/i, core.ops.helpme);
 

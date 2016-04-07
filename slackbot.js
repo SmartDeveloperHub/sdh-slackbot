@@ -21,6 +21,7 @@
 */
 
 var log = null;
+var slack = null;
 
 var init = function() {
 
@@ -43,8 +44,10 @@ var init = function() {
 
 var startBOT = function startBOT () {
 
+    log.info('...Starting SlackBot...');
+
     // Shut down function
-    var gracefullyShuttinDown = function gracefullyShuttinDown() {
+    var gracefullyShuttingDown = function gracefullyShuttingDown() {
         log.warn('Shut down signal Received ');
         log.warn(" ! Shutting Down SDH-API manually.");
         setTimeout(function () {
@@ -52,8 +55,8 @@ var startBOT = function startBOT () {
         }, 500);
     };
     // Set security handlers
-    process.on('SIGINT', gracefullyShuttinDown);
-    process.on('SIGTERM', gracefullyShuttinDown);
+    process.on('SIGINT', gracefullyShuttingDown);
+    process.on('SIGTERM', gracefullyShuttingDown);
 
     process.on('uncaughtException', function (err) {
         log.error(err);
@@ -62,41 +65,24 @@ var startBOT = function startBOT () {
 
     if (!SLACK_BOT_TOKEN) {
         log.error('SLACK_BOT_TOKEN not found');
-        gracefullyShuttinDown();
+        gracefullyShuttingDown();
         return;
     }
-
-    log.info("... Loading Modules...");
-    try {
-        GLOBAL.moment = require("moment");
-        GLOBAL.request = require('request');
-    } catch (err) {
-        log.error(" ! Error loading dependencies: " + err);
-        log.info('Exiting...');
-        setTimeout(function () {
-            process.exit(0);
-        }, 500);
-    }
-    log.info('...starting...');
 
     // Create a new logger
     var corelog = log.child({in: 'core'});
 
-    require('sdh-core-bot')("<@USLACKBOT>", 'https://sdh.conwet.fi.upm.es/sdhapi', 'https://sdh.conwet.fi.upm.es/', corelog).then(function(sdhBot) {
-
-        GLOBAL.sdhBot = sdhBot;
-        launchSlackBot(sdhBot);
-
-        log.info('... slackbot Listening! ...');
-    });
+    // Load core
+    require('sdh-core-bot')("<@USLACKBOT>", SDH_API_URL, SDH_DASHBOARD_URL, corelog).then(launchSlackBot);
 
 };
 
 var launchSlackBot = function launchSlackBot (core) {
-    log.info('...loading slack bot interface ...');
-    bot = require("./slackInterface.js")(core, log);
-    bot.setListeners();
-    log.info('...slack interface ready...');
+    log.info('Loading slack bot interface');
+    slack = require("./slackInterface.js")(core, log);
+    slack.setListeners();
+    log.info('Slack interface ready');
+    log.info('...SlackBot listening!...');
 };
 
 init();

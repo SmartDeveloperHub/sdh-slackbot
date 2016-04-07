@@ -43,14 +43,14 @@ module.exports = function(core, log) {
     _exports.setListeners = function setListeners() {
 
         // Register directives in the core
-        require("./patterns")(sdhBot);
+        require("./patterns")(core);
 
         controller.on('direct_message', function(bot, message) {
 
             replaceSlackIds(message.text).then(function(text) {
 
                 try {
-                    sdhBot.handleMessage(text, function(err, coreResponse) {
+                    core.handleMessage(text, function(err, coreResponse) {
                         if(err) {
                             log.error(err);
                         } else {
@@ -95,7 +95,7 @@ module.exports = function(core, log) {
 
             if(userInfos.length > 0) {
                 var slackIdMappings = {};
-                var getSdhMembers = Promise.promisify(core.getSDHMembers);
+                var getSdhMembers = Promise.promisify(core.data.getSDHMembers);
 
                 return getSdhMembers().then(function(sdhMembers) {
                     for(var u = 0; u < userInfos.length; u++) {
