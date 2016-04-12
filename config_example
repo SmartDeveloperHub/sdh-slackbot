@@ -49,3 +49,6 @@ GLOBAL.FILE_LOG_NFILES = 4                 // The number of rotated files to kee
 // SDH API
 GLOBAL.SDH_API_URL = "http://localhost";
 GLOBAL.SDH_API_PORT = 8080;
+
+// ELASTIC SEARCH
+GLOBAL.SEARCH_URL = "http://localhost:9200";
