@@ -30,8 +30,19 @@ module.exports = function(core) {
     core.registerDirective(/give me all metrics/i, core.ops.allMetrics);
 
     // Return SDH metric
-    core.registerDirective(/give me metrics about ([\s\S]+)/i, core.ops.getMetricsAbout, [0]);
-    core.registerDirective(/give me ([\s\S]+) metrics/i, core.ops.getMetricsAbout, [0]);
+    core.registerDirective(/give me metrics about ([\s\S]+)/i, core.ops.getMetricsAbout, [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me ([\s\S]+) metrics/i, core.ops.getMetricsAbout, [new core.RgxSubstr(0)]);
+
+    // Return a SDH metric data
+    core.registerDirective(/give me metric ([\s\S]+) for ([\s\S]+)/i, core.ops.metric, [
+        new core.RgxSubstr(0),
+        {
+            param: new core.RgxSubstr(1)
+        }
+    ]);
+
+    // Return a SDH view data
+    core.registerDirective(/give me ([\s\S]+) view/i, core.ops.view, [new core.RgxSubstr(0)]);
 
     // Return complete SDH views list
     core.registerDirective(/give me all views/i, core.ops.allViews);
@@ -52,22 +63,16 @@ module.exports = function(core) {
     core.registerDirective(/give me all repos(?:itories)?/i, core.ops.allRepos);
 
     // Return a SDH product
-    core.registerDirective(/give me ([\s\S]+) product/i, core.ops.product, [0]);
+    core.registerDirective(/give me ([\s\S]+) product/i, core.ops.product, [new core.RgxSubstr(0)]);
 
     // Return a SDH project
-    core.registerDirective(/give me ([\s\S]+) project/i, core.ops.project, [0]);
+    core.registerDirective(/give me ([\s\S]+) project/i, core.ops.project, [new core.RgxSubstr(0)]);
 
     // Return a SDH member
-    core.registerDirective(/give me ([\s\S]+) (?:user|member)/i, core.ops.member, [0]);
+    core.registerDirective(/give me ([\s\S]+) (?:user|member)/i, core.ops.member, [new core.RgxSubstr(0)]);
 
     // Return a SDH repository
-    core.registerDirective(/give me ([\s\S]+) repo(?:sitory)?/i, core.ops.repo, [0]);
-
-    // Return a SDH metric data
-    core.registerDirective(/give me ([\s\S]+) metric/i, core.ops.metric, [0]);
-
-    // Return a SDH view data
-    core.registerDirective(/give me ([\s\S]+) view/i, core.ops.view, [0]);
+    core.registerDirective(/give me ([\s\S]+) repo(?:sitory)?/i, core.ops.repo, [new core.RgxSubstr(0)]);
 
 
     //var corePatterns = {
