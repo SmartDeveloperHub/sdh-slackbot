@@ -33,11 +33,14 @@ module.exports = function(core) {
     core.registerDirective(/give me metrics about ([\s\S]+)/i, core.ops.getMetricsAbout, [new core.RgxSubstr(0)]);
     core.registerDirective(/give me ([\s\S]+) metrics/i, core.ops.getMetricsAbout, [new core.RgxSubstr(0)]);
 
-    // Return a SDH metric data
-    core.registerDirective(/give me metric ([\s\S]+) for ([\s\S]+)/i, core.ops.metric, [
-        new core.RgxSubstr(0),
+    // Return a SDH metric data (match things like "give me 5 values with the avg of metric product-commits for Alejandro Vera")
+    core.registerDirective(/give me (?:(\d+)\svalues )?(?:(?:with )?the (avg|max|sum) )?(?:of )?metric (\S+(?:\s\S+)*?) for (\S+(?:\s\S+)*?)(?: as (image))?$/i, core.ops.metric, [
+        new core.RgxSubstr(2),
         {
-            param: new core.RgxSubstr(1)
+            max: new core.RgxSubstr(0),
+            aggr: new core.RgxSubstr(1),
+            param: new core.RgxSubstr(3),
+            format: new core.RgxSubstr(4)
         }
     ]);
 

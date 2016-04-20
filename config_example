@@ -50,5 +50,11 @@ GLOBAL.FILE_LOG_NFILES = 4                 // The number of rotated files to kee
 GLOBAL.SDH_API_URL = "http://localhost";
 GLOBAL.SDH_API_PORT = 8080;
 
+// SDH IMAGES SERVICE
+GLOBAL.SDH_IMAGES_SERVICE = "http://localhost:8888";
+
+// DEFAULT SDH Dashboards
+GLOBAL.SDH_DASHBOARD_URL = "http://localhost";
+
 // ELASTIC SEARCH
 GLOBAL.SEARCH_URL = "http://localhost:9200";

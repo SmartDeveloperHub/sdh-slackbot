@@ -73,7 +73,7 @@ var startBOT = function startBOT () {
     var corelog = log.child({in: 'core'});
 
     // Load core
-    require('sdh-core-bot')("<@USLACKBOT>", SDH_API_URL, SDH_DASHBOARD_URL, SEARCH_URL, corelog).then(launchSlackBot);
+    require('sdh-core-bot')("<@USLACKBOT>", SDH_API_URL, SDH_DASHBOARD_URL, SEARCH_URL, SDH_IMAGES_SERVICE, corelog).then(launchSlackBot);
 
 };
 
