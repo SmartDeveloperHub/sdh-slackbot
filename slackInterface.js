@@ -53,6 +53,7 @@ module.exports = function(core, log) {
                     core.handleMessage(text, function(err, coreResponse) {
                         if(err) {
                             log.error(err);
+                            genericSlackCallback(bot, message, err.message);
                         } else {
                             genericSlackCallback(bot, message, coreResponse);
                         }
