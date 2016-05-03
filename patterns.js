@@ -23,6 +23,8 @@
 
 module.exports = function(core) {
 
+
+
     // Return core bot help information
     core.registerDirective(/help/i, core.ops.helpme);
 
@@ -34,7 +36,7 @@ module.exports = function(core) {
     core.registerDirective(/give me ([\s\S]+) metrics/i, core.ops.getMetricsAbout, [new core.RgxSubstr(0)]);
 
     // Return a SDH metric data (match things like "give me 5 values with the avg of metric product-commits for Alejandro Vera from last month until last Friday as image")
-    core.registerDirective(/give me (?:(\d+)\svalues )?(?:(?:with )?the (avg|max|sum) )?(?:of )?metric (\S+(?:\s\S+)*?) for (\S+(?:\s\S+)*?)(?: from (\S+(?:\s\S+)*?))?(?: until (\S+(?:\s\S+)*?))?(?: as (image))?$/i,
+    core.registerDirective(/give me (?:(\d+)\svalues )?(?:(?:with )?the (avg|max|sum) )?(?:of )?metric (\S+(?:\s\S+)*?)(?: for (\S+(?:\s\S+)*?))?(?: from (\S+(?:\s\S+)*?))?(?: until (\S+(?:\s\S+)*?))?(?: as (image))?$/i,
         core.ops.metric,
         [
             new core.RgxSubstr(2),
@@ -45,6 +47,19 @@ module.exports = function(core) {
                 from: new core.RgxSubstr(4),
                 to: new core.RgxSubstr(5),
                 format: new core.RgxSubstr(6)
+            }
+        ]
+    );
+
+    // Return a SDH view (match things like "give me 5 values of view view-member-repositories for Alejandro Vera")
+    core.registerDirective(/give me view (\S+(?:\s\S+)*?)(?: for (\S+(?:\s\S+)*?))?(?: from (\S+(?:\s\S+)*?))?(?: until (\S+(?:\s\S+)*?))?$/i,
+        core.ops.view,
+        [
+            new core.RgxSubstr(0),
+            {
+                param: new core.RgxSubstr(1),
+                from: new core.RgxSubstr(2),
+                to: new core.RgxSubstr(3)
             }
         ]
     );
