@@ -43,7 +43,7 @@ module.exports = function(core, log) {
     _exports.setListeners = function setListeners() {
 
         // Register directives in the core
-        require("./patterns")(core);
+        require("./patterns")(core, bot);
 
         controller.on('direct_message', function(bot, message) {
 
@@ -149,11 +149,8 @@ module.exports = function(core, log) {
 
 
     var genericSlackCallback = function genericSlackCallback(bot, message, coreResponse) {
-        if(typeof coreResponse === 'string') {
-            bot.reply(message, coreResponse);
-        } else {
-            bot.reply(message, JSON.stringify(coreResponse));
-        }
+
+        bot.reply(message, coreResponse);
 
     };
 

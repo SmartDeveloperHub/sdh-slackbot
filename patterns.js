@@ -21,23 +21,23 @@
 */
 'use strict';
 
-module.exports = function(core) {
+module.exports = function(core, bot) {
 
-
+    var f = require("./formats")(bot);
 
     // Return core bot help information
     core.registerDirective(/help/i, core.ops.helpme);
 
     // Return complete SDH metrics list
-    core.registerDirective(/give me all metrics/i, core.ops.allMetrics);
+    core.registerDirective(/give me all metrics/i, f.nullFormat(core.ops.allMetrics));
 
     // Return SDH metric
-    core.registerDirective(/give me metrics about ([\s\S]+)/i, core.ops.getMetricsAbout, [new core.RgxSubstr(0)]);
-    core.registerDirective(/give me ([\s\S]+) metrics/i, core.ops.getMetricsAbout, [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me metrics about ([\s\S]+)/i, f.nullFormat(core.ops.getMetricsAbout), [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me ([\s\S]+) metrics/i, f.nullFormat(core.ops.getMetricsAbout), [new core.RgxSubstr(0)]);
 
     // Return a SDH metric data (match things like "give me 5 values with the avg of metric product-commits for Alejandro Vera from last month until last Friday as image")
     core.registerDirective(/give me (?:(\d+)\svalues )?(?:(?:with )?the (avg|max|sum) )?(?:of )?metric (\S+(?:\s\S+)*?)(?: for (\S+(?:\s\S+)*?))?(?: from (\S+(?:\s\S+)*?))?(?: until (\S+(?:\s\S+)*?))?(?: as (image))?$/i,
-        core.ops.metric,
+        f.nullFormat(core.ops.metric),
         [
             new core.RgxSubstr(2),
             {
@@ -53,7 +53,7 @@ module.exports = function(core) {
 
     // Return a SDH view (match things like "give me 5 values of view view-member-repositories for Alejandro Vera")
     core.registerDirective(/give me view (\S+(?:\s\S+)*?)(?: for (\S+(?:\s\S+)*?))?(?: from (\S+(?:\s\S+)*?))?(?: until (\S+(?:\s\S+)*?))?$/i,
-        core.ops.view,
+        f.nullFormat(core.ops.view),
         [
             new core.RgxSubstr(0),
             {
@@ -65,37 +65,37 @@ module.exports = function(core) {
     );
 
     // Return a SDH view data
-    core.registerDirective(/give me ([\s\S]+) view/i, core.ops.view, [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me ([\s\S]+) view/i, f.nullFormat(core.ops.view), [new core.RgxSubstr(0)]);
 
     // Return complete SDH views list
-    core.registerDirective(/give me all views/i, core.ops.allViews);
+    core.registerDirective(/give me all views/i, f.nullFormat(core.ops.allViews));
 
     // Return complete SDH organizations list
-    core.registerDirective(/give me all organizations/i, core.ops.allOrgs);
+    core.registerDirective(/give me all organizations/i, f.nullFormat(core.ops.allOrgs));
 
     // Return complete SDH products list
-    core.registerDirective(/give me all products/i, core.ops.allProducts);
+    core.registerDirective(/give me all products/i, f.nullFormat(core.ops.allProducts));
 
     // Return complete SDH projects list
-    core.registerDirective(/give me all projects/i, core.ops.allProjects);
+    core.registerDirective(/give me all projects/i, f.nullFormat(core.ops.allProjects));
 
     // Return complete SDH members list
-    core.registerDirective(/give me all (?:users|members)/i, core.ops.allMembers);
+    core.registerDirective(/give me all (?:users|members)/i, f.formatUsers(core.ops.allMembers));
 
     // Return complete SDH repositories list
-    core.registerDirective(/give me all repos(?:itories)?/i, core.ops.allRepos);
+    core.registerDirective(/give me all repos(?:itories)?/i, f.nullFormat(core.ops.allRepos));
 
     // Return a SDH product
-    core.registerDirective(/give me ([\s\S]+) product/i, core.ops.product, [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me ([\s\S]+) product/i, f.nullFormat(core.ops.product), [new core.RgxSubstr(0)]);
 
     // Return a SDH project
-    core.registerDirective(/give me ([\s\S]+) project/i, core.ops.project, [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me ([\s\S]+) project/i, f.nullFormat(core.ops.project), [new core.RgxSubstr(0)]);
 
     // Return a SDH member
-    core.registerDirective(/give me ([\s\S]+) (?:user|member)/i, core.ops.member, [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me ([\s\S]+) (?:user|member)/i, f.formatUsers(core.ops.member), [new core.RgxSubstr(0)]);
 
     // Return a SDH repository
-    core.registerDirective(/give me ([\s\S]+) repo(?:sitory)?/i, core.ops.repo, [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me ([\s\S]+) repo(?:sitory)?/i, f.nullFormat(core.ops.repo), [new core.RgxSubstr(0)]);
 
 
     //var corePatterns = {
