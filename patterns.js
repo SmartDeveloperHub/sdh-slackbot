@@ -71,31 +71,31 @@ module.exports = function(core, bot) {
     core.registerDirective(/give me all views/i, f.nullFormat(core.ops.allViews));
 
     // Return complete SDH organizations list
-    core.registerDirective(/give me all organizations/i, f.nullFormat(core.ops.allOrgs));
+    core.registerDirective(/give me all organizations/i, f.formatOrganizations(core.ops.allOrgs));
 
     // Return complete SDH products list
-    core.registerDirective(/give me all products/i, f.nullFormat(core.ops.allProducts));
+    core.registerDirective(/give me all products/i, f.formatProducts(core.ops.allProducts));
 
     // Return complete SDH projects list
-    core.registerDirective(/give me all projects/i, f.nullFormat(core.ops.allProjects));
+    core.registerDirective(/give me all projects/i, f.formatProjects(core.ops.allProjects));
 
     // Return complete SDH members list
     core.registerDirective(/give me all (?:users|members)/i, f.formatUsers(core.ops.allMembers));
 
     // Return complete SDH repositories list
-    core.registerDirective(/give me all repos(?:itories)?/i, f.nullFormat(core.ops.allRepos));
+    core.registerDirective(/give me all repos(?:itories)?/i, f.formatRepositories(core.ops.allRepos));
 
     // Return a SDH product
-    core.registerDirective(/give me ([\s\S]+) product/i, f.nullFormat(core.ops.product), [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me ([\s\S]+) product/i, f.formatProducts(core.ops.product), [new core.RgxSubstr(0)]);
 
     // Return a SDH project
-    core.registerDirective(/give me ([\s\S]+) project/i, f.nullFormat(core.ops.project), [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me ([\s\S]+) project/i, f.formatProjects(core.ops.project), [new core.RgxSubstr(0)]);
 
     // Return a SDH member
     core.registerDirective(/give me ([\s\S]+) (?:user|member)/i, f.formatUsers(core.ops.member), [new core.RgxSubstr(0)]);
 
     // Return a SDH repository
-    core.registerDirective(/give me ([\s\S]+) repo(?:sitory)?/i, f.nullFormat(core.ops.repo), [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me ([\s\S]+) repo(?:sitory)?/i, f.formatRepositories(core.ops.repo), [new core.RgxSubstr(0)]);
 
 
     //var corePatterns = {
