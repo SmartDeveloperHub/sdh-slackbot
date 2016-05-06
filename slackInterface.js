@@ -107,7 +107,7 @@ module.exports = function(core, log) {
                         for(var m = 0; m < sdhMembers.length; m++) {
                             var sdhUser = sdhMembers[m];
                             if(slackUser.name == sdhUser.nick) { //Perfect match, set the sdhid
-                                slackIdMappings[slackUser.id] = "sdhid:" + sdhUser.userid;
+                                slackIdMappings[slackUser.id] = "sdhid:" + sdhUser.uid;
                                 perfectMatch = true;
                                 break;
                             }
