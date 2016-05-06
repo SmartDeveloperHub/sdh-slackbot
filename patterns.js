@@ -51,6 +51,9 @@ module.exports = function(core, bot) {
         ]
     );
 
+    // Return complete SDH views list
+    core.registerDirective(/give me all views/i, f.nullFormat(core.ops.allViews));
+
     // Return a SDH view (match things like "give me 5 values of view view-member-repositories for Alejandro Vera")
     core.registerDirective(/give me view (\S+(?:\s\S+)*?)(?: for (\S+(?:\s\S+)*?))?(?: from (\S+(?:\s\S+)*?))?(?: until (\S+(?:\s\S+)*?))?$/i,
         f.nullFormat(core.ops.view),
@@ -65,10 +68,8 @@ module.exports = function(core, bot) {
     );
 
     // Return a SDH view data
-    core.registerDirective(/give me ([\s\S]+) view/i, f.nullFormat(core.ops.view), [new core.RgxSubstr(0)]);
-
-    // Return complete SDH views list
-    core.registerDirective(/give me all views/i, f.nullFormat(core.ops.allViews));
+    core.registerDirective(/give me views about ([\s\S]+)/i, f.nullFormat(core.ops.getViewsAbout), [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me ([\s\S]+) views/i, f.nullFormat(core.ops.getViewsAbout), [new core.RgxSubstr(0)]);
 
     // Return complete SDH organizations list
     core.registerDirective(/give me all organizations/i, f.formatOrganizations(core.ops.allOrgs));
@@ -96,25 +97,6 @@ module.exports = function(core, bot) {
 
     // Return a SDH repository
     core.registerDirective(/give me ([\s\S]+) repo(?:sitory)?/i, f.formatRepositories(core.ops.repo), [new core.RgxSubstr(0)]);
-
-
-    //var corePatterns = {
-    //    '/help/':{
-    //        'callback': core.ops.helpme,
-    //        'description': "Return core bot help information"
-    //    },
-    //    /*'/give me [\\s\\S]+ information/':{
-    //     'callback': allRepos,
-    //     'description': "Return complete SDH products list"
-    //     },*/
-    //    //'/[a-zA-Z]+/':{
-    //    /*'/[\\s\\S]/':{
-    //     'callback': sdhParser,
-    //     'description': "Return elastic matching info"
-    //     }*/
-    //};
-    //
-    //return corePatterns;
 
     return {};
 

@@ -153,7 +153,7 @@ module.exports = function(bot) {
 
     };
 
-    var nullFormatter = function(err, response) {
+    var nullFormatter = function(err, response, cb) {
         cb(err,(typeof response === 'object' ? JSON.stringify(response) : response));
     };
 
