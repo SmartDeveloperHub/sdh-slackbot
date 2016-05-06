@@ -81,6 +81,25 @@ module.exports = function(bot) {
                 value: "<title>",
                 short: true
             }
+        ],
+        metric: [
+            {
+                title: "Id",
+                value: "<id>",
+                short: true
+            },
+            {
+                title: "Description",
+                value: "<description>",
+                short: true
+            }
+        ],
+        view: [
+            {
+                title: "Id",
+                value: "<id>",
+                short: true
+            }
         ]
     };
 
@@ -216,6 +235,8 @@ module.exports = function(bot) {
         formatProducts: createFormatFunction(genericObjectFormatter.bind(undefined, mappings.product, options.product)),
         formatProjects: createFormatFunction(genericObjectFormatter.bind(undefined, mappings.project, options.project)),
         formatOrganizations: createFormatFunction(genericObjectFormatter.bind(undefined, mappings.organization, options.organization)),
+        formatMetrics: createFormatFunction(genericObjectFormatter.bind(undefined, mappings.metric, options.metric)),
+        formatViews: createFormatFunction(genericObjectFormatter.bind(undefined, mappings.view, options.view)),
         nullFormat: createFormatFunction(nullFormatter)
     }
 
