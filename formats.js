@@ -21,105 +21,151 @@
 */
 'use strict';
 
-module.exports = function(bot) {
+module.exports = function(bot, log) {
 
     var PAGINATION_SIZE = 5;
 
-    // Visualization functions
-    var mappings = {
-        user: [
-            {
-                title: "Name",
-                value: "<name>",
-                short: true
+    var mappings = [ //Order is important!
+        {
+            selectionConditions: {
+                containsProperty: ['uid']
             },
-            {
-                title: "Nick",
-                value: "<nick>",
-                short: true
+            attachmentFields: [
+                {
+                    title: "Name",
+                    value: "<name>",
+                    short: true
+                },
+                {
+                    title: "Nick",
+                    value: "<nick>",
+                    short: true
+                }
+            ],
+            attachmentOptions: {
+                thumb_url: "<avatar>"
             }
-        ],
-        repository: [
-            {
-                title: "Name",
-                value: "<name>",
-                short: true
-            },
-            {
-                title: "Created on",
-                value: "<createdon>",
-                short: true
-            },
-            {
-                title: "First commit",
-                value: "<firstcommit>",
-                short: true
-            },
-            {
-                title: "Last commit",
-                value: "<lastcommit>",
-                short: true
-            }
-        ],
-        product: [
-            {
-                title: "Name",
-                value: "<name>",
-                short: true
-            }
-        ],
-        project: [
-            {
-                title: "Name",
-                value: "<name>",
-                short: true
-            }
-        ],
-        organization: [
-            {
-                title: "Name",
-                value: "<title>",
-                short: true
-            }
-        ],
-        metric: [
-            {
-                title: "Id",
-                value: "<id>",
-                short: true
-            },
-            {
-                title: "Description",
-                value: "<description>",
-                short: true
-            }
-        ],
-        view: [
-            {
-                title: "Id",
-                value: "<id>",
-                short: true
-            }
-        ]
-    };
 
-    var options = {
-        user: {
-            thumb_url: "<avatar>"
         },
-        repository: {
-            thumb_url: "<avatar>"
+
+        {
+            selectionConditions: {
+                containsProperty: ['rid']
+            },
+            attachmentFields: [
+                {
+                    title: "Name",
+                    value: "<name>",
+                    short: true
+                },
+                {
+                    title: "Created on",
+                    value: "<createdon>",
+                    short: true
+                },
+                {
+                    title: "First commit",
+                    value: "<firstcommit>",
+                    short: true
+                },
+                {
+                    title: "Last commit",
+                    value: "<lastcommit>",
+                    short: true
+                }
+            ],
+            attachmentOptions: {
+                thumb_url: "<avatar>"
+            }
+
         },
-        product: {
-            thumb_url: "<avatar>"
+
+        {
+            selectionConditions: {
+                containsProperty: ['prid']
+            },
+            attachmentFields: [
+                {
+                    title: "Name",
+                    value: "<name>",
+                    short: true
+                }
+            ],
+            attachmentOptions: {
+                thumb_url: "<avatar>"
+            }
+
         },
-        project: {
-            thumb_url: "<avatar>"
+
+        {
+            selectionConditions: {
+                containsProperty: ['pjid']
+            },
+            attachmentFields: [
+                {
+                    title: "Name",
+                    value: "<name>",
+                    short: true
+                }
+            ],
+            attachmentOptions: {
+                thumb_url: "<avatar>"
+            }
+
         },
-        organization: {
-            thumb_url: "<avatar>"
+
+        {
+            selectionConditions: {
+                containsProperty: ['oid']
+            },
+            attachmentFields: [
+                {
+                    title: "Name",
+                    value: "<name>",
+                    short: true
+                }
+            ],
+            attachmentOptions: {
+                thumb_url: "<avatar>"
+            }
+
+        },
+
+        { //Metric info
+            selectionConditions: {
+                containsProperty: ['aggr']
+            },
+            attachmentFields: [
+                {
+                    title: "Id",
+                    value: "<id>",
+                    short: true
+                },
+                {
+                    title: "Description",
+                    value: "<description>",
+                    short: true
+                }
+            ],
+            attachmentOptions: {}
+
+        },
+
+        { //View info
+            selectionConditions: {
+                containsProperty: ['id']
+            },
+            attachmentFields: [
+                {
+                    title: "Id",
+                    value: "<id>",
+                    short: true
+                }
+            ],
+            attachmentOptions: {}
+
         }
-    };
+    ];
 
     var createFormatFunction = function(formatter) {
 
@@ -172,71 +218,145 @@ module.exports = function(bot) {
 
     };
 
+    var detectObjectType = function(obj) {
+
+        for(var m = 0; m < mappings.length; ++m) {
+            var objInfo = mappings[m];
+
+            if(objInfo.selectionConditions.containsProperty) {
+                for(var p = 0; p < objInfo.selectionConditions.containsProperty.length; ++p) {
+                    if(objInfo.selectionConditions.containsProperty[p] in obj) {
+                        return objInfo;
+                    }
+                }
+            }
+        }
+
+    };
+
+    var formatObject = function(obj, typeInfo) {
+        if(typeof obj === 'object') {
+
+            if(typeInfo) {
+                return createAttachment(obj, typeInfo.attachmentFields, typeInfo.attachmentOptions || {});
+            } else {
+                return null;
+            }
+
+        } else {
+            return null;
+        }
+    };
+
     var nullFormatter = function(err, response, cb) {
         cb(err,(typeof response === 'object' ? JSON.stringify(response) : response));
     };
 
-    var genericObjectFormatter = function(mappings, options, err, response, cb) {
+    var genericObjectFormatter = function(err, response, cb) {
 
         if(err) {
             cb(err);
         }
 
-        var formatObject = function(obj) {
-            if(typeof obj === 'object') {
-                return createAttachment(obj, mappings, options || {});
-            } else {
-                return null;
-            }
-        };
-
         var attachments = [];
+        var typeInfo;
+        var formatted;
 
         if(response instanceof Array) {
 
-            var paginationSize = PAGINATION_SIZE;
+            if(response.length) {
 
-            if(response.length > paginationSize && options != null && options.thumb_url != null) {
-                cb(null, "There is a lot of images in the result, it make take some time for Slack to process them. Please be patient. :simple_smile:)");
-            } else {
-                paginationSize = response.length; // Do not paginate if there is no images of there is not too many
-            }
+                var paginationSize = PAGINATION_SIZE;
 
-            // Send the attachments paginated
-            var r = 0, sent = 0;
-            while(r < response.length) {
+                //Detect the type of the objects (take the first element as a representative object)
+                typeInfo = detectObjectType(response[0]);
 
-                for(var inPage = 0; r < response.length && inPage < paginationSize; ++r, ++inPage) {
-                    attachments.push(formatObject(response[r]));
+                if(typeInfo && response.length > paginationSize && typeInfo.attachmentOptions != null && typeInfo.attachmentOptions.thumb_url != null) {
+                    cb(null, "There are a lot of images in the result, it may take some time for Slack to process them. Please be patient. :simple_smile:");
+                } else {
+                    paginationSize = response.length; // Do not paginate if there is no images of there is not too many
                 }
 
-                // Send messages witha difference of 1 second from the previous one
-                setTimeout(function(attachments) {
-                    cb(null, {
-                        attachments: attachments
-                    });
-                }.bind(null, attachments), sent++ * 1000);
+                // Send the attachments paginated
+                var r = 0, sent = 0;
+                while(r < response.length) {
 
-                attachments = [];
+                    for(var inPage = 0; r < response.length && inPage < paginationSize; ++r, ++inPage) {
+                        formatted = formatObject(response[r], typeInfo);
+                        if(formatted) {
+                            attachments.push(formatted);
+                        } else {
+                            log.warn("Unknown object type")
+                        }
+                    }
+
+                    // Send messages witha difference of 1 second from the previous one
+                    setTimeout(function(attachments) {
+                        cb(null, {
+                            attachments: attachments
+                        });
+                    }.bind(null, attachments), sent++ * 1000);
+
+                    attachments = [];
+                }
+
+            } else {
+                cb(null, "There is no information to display...");
             }
 
         } else {
-            attachments.push(formatObject(response));
-            cb(null, {
-                attachments: attachments
-            });
+
+            //Detect the type of the object and get the mapping info
+            typeInfo = detectObjectType(obj);
+
+            formatted = formatObject(response, typeInfo);
+            if(formatted) {
+                attachments.push(formatted);
+                cb(null, {
+                    attachments: attachments
+                });
+            } else {
+                log.warn("Unknown object type")
+            }
+
         }
 
     };
 
+    var metricFormatter = function(err, response, cb) {
+
+        if(err) {
+            cb(err);
+        }
+
+        if(typeof response === 'object' && response.values != null) {
+            cb(null, response.values.join(", "));
+        } else {
+            cb(null, response);
+        }
+
+    };
+
+    var viewFormatter = function(err, response, cb) {
+
+        if(err) {
+            cb(err);
+        }
+
+        genericObjectFormatter(err, response.values, cb);
+
+    };
+
     return {
-        formatUsers: createFormatFunction(genericObjectFormatter.bind(undefined, mappings.user, options.user)),
-        formatRepositories: createFormatFunction(genericObjectFormatter.bind(undefined, mappings.repository, options.repository)),
-        formatProducts: createFormatFunction(genericObjectFormatter.bind(undefined, mappings.product, options.product)),
-        formatProjects: createFormatFunction(genericObjectFormatter.bind(undefined, mappings.project, options.project)),
-        formatOrganizations: createFormatFunction(genericObjectFormatter.bind(undefined, mappings.organization, options.organization)),
-        formatMetrics: createFormatFunction(genericObjectFormatter.bind(undefined, mappings.metric, options.metric)),
-        formatViews: createFormatFunction(genericObjectFormatter.bind(undefined, mappings.view, options.view)),
+        formatUsers: createFormatFunction(genericObjectFormatter),
+        formatRepositories: createFormatFunction(genericObjectFormatter),
+        formatProducts: createFormatFunction(genericObjectFormatter),
+        formatProjects: createFormatFunction(genericObjectFormatter),
+        formatOrganizations: createFormatFunction(genericObjectFormatter),
+        formatMetricsInfo: createFormatFunction(genericObjectFormatter),
+        formatMetricData: createFormatFunction(metricFormatter),
+        formatViewsInfo: createFormatFunction(genericObjectFormatter),
+        formatViewsData: createFormatFunction(viewFormatter),
         nullFormat: createFormatFunction(nullFormatter)
     }
 

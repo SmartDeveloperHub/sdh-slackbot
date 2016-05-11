@@ -21,23 +21,23 @@
 */
 'use strict';
 
-module.exports = function(core, bot) {
+module.exports = function(core, bot, log) {
 
-    var f = require("./formats")(bot);
+    var f = require("./formats")(bot, log);
 
     // Return core bot help information
     core.registerDirective(/help/i, core.ops.helpme);
 
     // Return complete SDH metrics list
-    core.registerDirective(/give me all metrics/i, f.formatMetrics(core.ops.allMetrics));
+    core.registerDirective(/give me all metrics/i, f.formatMetricsInfo(core.ops.allMetrics));
 
     // Return SDH metric
-    core.registerDirective(/give me metrics about ([\s\S]+)/i, f.formatMetrics(core.ops.getMetricsAbout), [new core.RgxSubstr(0)]);
-    core.registerDirective(/give me ([\s\S]+) metrics/i, f.formatMetrics(core.ops.getMetricsAbout), [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me metrics about ([\s\S]+)/i, f.formatMetricsInfo(core.ops.getMetricsAbout), [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me ([\s\S]+) metrics/i, f.formatMetricsInfo(core.ops.getMetricsAbout), [new core.RgxSubstr(0)]);
 
     // Return a SDH metric data (match things like "give me 5 values with the avg of metric product-commits for Alejandro Vera from last month until last Friday as image")
-    core.registerDirective(/give me (?:(\d+)\svalues )?(?:(?:with )?the (avg|max|sum) )?(?:of )?metric (\S+(?:\s\S+)*?)(?: for (\S+(?:\s\S+)*?))?(?: from (\S+(?:\s\S+)*?))?(?: until (\S+(?:\s\S+)*?))?(?: as (image))?$/i,
-        f.nullFormat(core.ops.metric),
+    core.registerDirective(/give me (?:(\d+)\svalue(?:s)? )?(?:(?:with )?the (avg|max|sum) )?(?:of )?metric (\S+(?:\s\S+)*?)(?: for (\S+(?:\s\S+)*?))?(?: from (\S+(?:\s\S+)*?))?(?: until (\S+(?:\s\S+)*?))?(?: as (image))?$/i,
+        f.formatMetricData(core.ops.metric),
         [
             new core.RgxSubstr(2),
             {
@@ -52,15 +52,15 @@ module.exports = function(core, bot) {
     );
 
     // Return complete SDH views list
-    core.registerDirective(/give me all views/i, f.formatViews(core.ops.allViews));
+    core.registerDirective(/give me all views/i, f.formatViewsInfo(core.ops.allViews));
 
     // Return a SDH view data
-    core.registerDirective(/give me views about ([\s\S]+)/i, f.formatViews(core.ops.getViewsAbout), [new core.RgxSubstr(0)]);
-    core.registerDirective(/give me ([\s\S]+) views/i, f.formatViews(core.ops.getViewsAbout), [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me views about ([\s\S]+)/i, f.formatViewsInfo(core.ops.getViewsAbout), [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me ([\s\S]+) views/i, f.formatViewsInfo(core.ops.getViewsAbout), [new core.RgxSubstr(0)]);
 
-    // Return a SDH view (match things like "give me 5 values of view view-member-repositories for Alejandro Vera")
+    // Return a SDH view (match things like "give me view view-member-repositories for Alejandro Vera")
     core.registerDirective(/give me view (\S+(?:\s\S+)*?)(?: for (\S+(?:\s\S+)*?))?(?: from (\S+(?:\s\S+)*?))?(?: until (\S+(?:\s\S+)*?))?$/i,
-        f.nullFormat(core.ops.view),
+        f.formatViewsData(core.ops.view),
         [
             new core.RgxSubstr(0),
             {

@@ -43,7 +43,7 @@ module.exports = function(core, log) {
     _exports.setListeners = function setListeners() {
 
         // Register directives in the core
-        require("./patterns")(core, bot);
+        require("./patterns")(core, bot, log);
 
         controller.on('direct_message', function(bot, message) {
 
