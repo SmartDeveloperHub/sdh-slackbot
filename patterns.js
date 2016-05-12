@@ -36,17 +36,17 @@ module.exports = function(core, bot, log) {
     core.registerDirective(/give me ([\s\S]+) metrics/i, f.formatMetricsInfo(core.ops.getMetricsAbout), [new core.RgxSubstr(0)]);
 
     // Return a SDH metric data (match things like "give me 5 values with the avg of metric product-commits for Alejandro Vera from last month until last Friday as image")
-    core.registerDirective(/give me (?:(\d+)\svalue(?:s)? )?(?:(?:with )?the (avg|max|sum) )?(?:of )?metric (\S+(?:\s\S+)*?)(?: for (\S+(?:\s\S+)*?))?(?: from (\S+(?:\s\S+)*?))?(?: until (\S+(?:\s\S+)*?))?(?: as (image))?$/i,
+    core.registerDirective(/give me(?: an (image) with)? (?:(\d+)\svalue(?:s)? )?(?:(?:with )?the (avg|max|sum) )?(?:of )?metric (\S+(?:\s\S+)*?)(?: for (\S+(?:\s\S+)*?))?(?: from (\S+(?:\s\S+)*?))?(?: until (\S+(?:\s\S+)*?))?$/i,
         f.formatMetricData(core.ops.metric),
         [
-            new core.RgxSubstr(2),
+            new core.RgxSubstr(3),
             {
-                max: new core.RgxSubstr(0),
-                aggr: new core.RgxSubstr(1),
-                param: new core.RgxSubstr(3),
-                from: new core.RgxSubstr(4),
-                to: new core.RgxSubstr(5),
-                format: new core.RgxSubstr(6)
+                max: new core.RgxSubstr(1),
+                aggr: new core.RgxSubstr(2),
+                param: new core.RgxSubstr(4),
+                from: new core.RgxSubstr(5),
+                to: new core.RgxSubstr(6),
+                format: new core.RgxSubstr(0)
             }
         ]
     );
