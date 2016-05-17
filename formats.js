@@ -32,18 +32,21 @@ module.exports = function(bot, log) {
             },
             attachmentFields: [
                 {
-                    title: "Name",
-                    value: "<name>",
-                    short: true
-                },
-                {
                     title: "Nick",
                     value: "<nick>",
                     short: true
                 }
             ],
             attachmentOptions: {
-                thumb_url: "<avatar>"
+                thumb_url: "<avatar>",
+                author_name: "<name>",
+                author_link: function(user) {
+                    var userEnv = {
+                        uid: user.uid,
+                        name: user.name
+                    };
+                    return generateDashboardLink(userEnv, 'developer');
+                }
             }
 
         },
@@ -53,11 +56,6 @@ module.exports = function(bot, log) {
                 containsProperty: ['rid']
             },
             attachmentFields: [
-                {
-                    title: "Name",
-                    value: "<name>",
-                    short: true
-                },
                 {
                     title: "Created on",
                     value: "<createdon>",
@@ -75,7 +73,15 @@ module.exports = function(bot, log) {
                 }
             ],
             attachmentOptions: {
-                thumb_url: "<avatar>"
+                thumb_url: "<avatar>",
+                author_name: "<name>",
+                author_link: function(repository) {
+                    var userEnv = {
+                        rid: repository.rid,
+                        name: repository.name
+                    };
+                    return generateDashboardLink(userEnv, 'repository');
+                }
             }
 
         },
@@ -84,15 +90,17 @@ module.exports = function(bot, log) {
             selectionConditions: {
                 containsProperty: ['prid']
             },
-            attachmentFields: [
-                {
-                    title: "Name",
-                    value: "<name>",
-                    short: true
-                }
-            ],
+            attachmentFields: [],
             attachmentOptions: {
-                thumb_url: "<avatar>"
+                thumb_url: "<avatar>",
+                author_name: "<name>",
+                author_link: function(product) {
+                    var userEnv = {
+                        prid: product.prid,
+                        name: product.name
+                    };
+                    return generateDashboardLink(userEnv, 'product');
+                }
             }
 
         },
@@ -101,15 +109,17 @@ module.exports = function(bot, log) {
             selectionConditions: {
                 containsProperty: ['pjid']
             },
-            attachmentFields: [
-                {
-                    title: "Name",
-                    value: "<name>",
-                    short: true
-                }
-            ],
+            attachmentFields: [],
             attachmentOptions: {
-                thumb_url: "<avatar>"
+                thumb_url: "<avatar>",
+                author_name: "<name>",
+                author_link: function(projects) {
+                    var userEnv = {
+                        pjid: projects.pjid,
+                        name: projects.name
+                    };
+                    return generateDashboardLink(userEnv, 'project');
+                }
             }
 
         },
@@ -167,6 +177,10 @@ module.exports = function(bot, log) {
         }
     ];
 
+    var generateDashboardLink = function(env, dashboard) {
+        return SDH_DASHBOARD_URL + "?env=" + encodeURIComponent(JSON.stringify(env)) + "&dashboard=" + dashboard
+    };
+
     var createFormatFunction = function(formatter) {
 
         return function(operation) {
@@ -184,11 +198,13 @@ module.exports = function(bot, log) {
 
     };
 
-    var parseValue = function(txt, object) {
-        if(txt[0] === '<' && txt[txt.length - 1] === '>') {
-            return object[txt.substring(1, txt.length - 1)];
+    var parseValue = function(format, object) {
+        if(typeof format === 'string' && format[0] === '<' && format[format.length - 1] === '>') {
+            return object[format.substring(1, format.length - 1)];
+        } else if(typeof format === 'function') {
+            return format(object);
         } else {
-            return txt;
+            return format;
         }
     };
 
