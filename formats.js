@@ -323,7 +323,7 @@ module.exports = function(bot, log) {
         } else {
 
             //Detect the type of the object and get the mapping info
-            typeInfo = detectObjectType(obj);
+            typeInfo = detectObjectType(response);
 
             formatted = formatObject(response, typeInfo);
             if(formatted) {

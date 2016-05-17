@@ -24,6 +24,16 @@
 module.exports = function(core, bot, log) {
 
     var f = require("./formats")(bot, log);
+    var SlackSdhMerge = require('./utils/merge')(core, bot);
+
+    var substituteWithCurrentUser = function(regexp, value, extraInfo) {
+        if(regexp.test(value)) {
+            var currentUserSlackId = extraInfo.user;
+            return SlackSdhMerge.replaceSlackIds("<@"+currentUserSlackId+">");
+        } else {
+            return value;
+        }
+    };
 
     // Return core bot help information
     core.registerDirective(/help/i, core.ops.helpme);
@@ -35,7 +45,7 @@ module.exports = function(core, bot, log) {
     core.registerDirective(/give me metrics about ([\s\S]+)/i, f.formatMetricsInfo(core.ops.getMetricsAbout), [new core.RgxSubstr(0)]);
     core.registerDirective(/give me ([\s\S]+) metrics/i, f.formatMetricsInfo(core.ops.getMetricsAbout), [new core.RgxSubstr(0)]);
 
-    // Return a SDH metric data (match things like "give me 5 values with the avg of metric product-commits for Alejandro Vera from last month until last Friday as image")
+    // Return a SDH metric data (match things like "give me an image with 5 values with the avg of metric product-commits for Alejandro Vera from last month until last Friday")
     core.registerDirective(/give me(?: an (image) with)? (?:(\d+)\svalue(?:s)? )?(?:(?:with )?the (avg|max|sum) )?(?:of )?metric (\S+(?:\s\S+)*?)(?: for (\S+(?:\s\S+)*?))?(?: from (\S+(?:\s\S+)*?))?(?: until (\S+(?:\s\S+)*?))?$/i,
         f.formatMetricData(core.ops.metric),
         [
@@ -43,7 +53,7 @@ module.exports = function(core, bot, log) {
             {
                 max: new core.RgxSubstr(1),
                 aggr: new core.RgxSubstr(2),
-                param: new core.RgxSubstr(4),
+                param: new core.RgxSubstr(4, substituteWithCurrentUser.bind(undefined, /^me$/)),
                 from: new core.RgxSubstr(5),
                 to: new core.RgxSubstr(6),
                 format: new core.RgxSubstr(0)
@@ -64,7 +74,7 @@ module.exports = function(core, bot, log) {
         [
             new core.RgxSubstr(0),
             {
-                param: new core.RgxSubstr(1),
+                param: new core.RgxSubstr(1, substituteWithCurrentUser.bind(undefined, /^me$/)),
                 from: new core.RgxSubstr(2),
                 to: new core.RgxSubstr(3)
             }
@@ -93,7 +103,9 @@ module.exports = function(core, bot, log) {
     core.registerDirective(/give me ([\s\S]+) project/i, f.formatProjects(core.ops.project), [new core.RgxSubstr(0)]);
 
     // Return a SDH member
-    core.registerDirective(/give me ([\s\S]+) (?:user|member)/i, f.formatUsers(core.ops.member), [new core.RgxSubstr(0)]);
+    core.registerDirective(/give me ([\s\S]+) (?:user|member)/i,
+        f.formatUsers(core.ops.member),
+        [new core.RgxSubstr(0, substituteWithCurrentUser.bind(undefined, /^my$/))]);
 
     // Return a SDH repository
     core.registerDirective(/give me ([\s\S]+) repo(?:sitory)?/i, f.formatRepositories(core.ops.repo), [new core.RgxSubstr(0)]);

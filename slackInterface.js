@@ -39,6 +39,8 @@ module.exports = function(core, log) {
         token: SLACK_BOT_TOKEN
     }).startRTM();
 
+    var SlackSdhMerge = require('./utils/merge')(core, bot);
+
 
     _exports.setListeners = function setListeners() {
 
@@ -47,7 +49,7 @@ module.exports = function(core, log) {
 
         controller.on('direct_message', function(bot, message) {
 
-            replaceSlackIds(message.text).then(function(text) {
+            SlackSdhMerge.replaceSlackIds(message.text).then(function(text) {
 
                 try {
                     core.handleMessage(text, function(err, coreResponse) {
@@ -59,7 +61,7 @@ module.exports = function(core, log) {
                         } else {
                             genericSlackCallback(bot, message, coreResponse);
                         }
-                    });
+                    }, {user: message.user});
                 } catch(e) {
                     log.error(e);
                 }
@@ -78,73 +80,6 @@ module.exports = function(core, log) {
             }
             callback(res.members);
         })
-    };
-
-    var replaceSlackIds = function(text) {
-
-        var getUserInfo = Promise.promisify(bot.api.users.info);
-
-        var userRegex = /<@(\S+)>/ig;
-        var resultPromises = [];
-        var m;
-        do {
-            m = userRegex.exec(text);
-            if (m) {
-                resultPromises.push(getUserInfo({user: m[1]}));
-            }
-        } while (m);
-
-        return Promise.all(resultPromises).then(function(userInfos) {
-
-            if(userInfos.length > 0) {
-                var slackIdMappings = {};
-                var getSdhMembers = Promise.promisify(core.data.getSDHMembers);
-
-                return getSdhMembers().then(function(sdhMembers) {
-                    for(var u = 0; u < userInfos.length; u++) {
-                        var slackUser = userInfos[u].user;
-                        var perfectMatch = false;
-                        for(var m = 0; m < sdhMembers.length; m++) {
-                            var sdhUser = sdhMembers[m];
-                            if(slackUser.name == sdhUser.nick) { //Perfect match, set the sdhid
-                                slackIdMappings[slackUser.id] = "sdhid:" + sdhUser.uid;
-                                perfectMatch = true;
-                                break;
-                            }
-                        }
-
-                        // Not a perfect match. Try to find some information to put instead of the slack id
-                        if(!perfectMatch) {
-                            if(slackUser.profile.real_name) {
-                                slackIdMappings[slackUser.id] = slackUser.profile.real_name;
-                            } else if(slackUser.profile.first_name && slackUser.profile.last_name) {
-                                slackIdMappings[slackUser.id] = slackUser.profile.first_name + " " + slackUser.profile.last_name;
-                            } else if(slackUser.profile.email) {
-                                slackIdMappings[slackUser.id] = slackUser.profile.email;
-                            } else {
-                                slackIdMappings[slackUser.id] = slackUser.name;
-                            }
-
-                        }
-
-                    }
-
-                    return slackIdMappings;
-                })
-            } else {
-                return {};
-            }
-
-        }).then(function(userAsocs) {
-            for(var slackId in userAsocs) {
-                if(userAsocs.hasOwnProperty(slackId)) {
-                    text = text.replace(new RegExp("<@"+slackId+">", 'g'), userAsocs[slackId]);
-                }
-            }
-
-            return text;
-        });
-
     };
 
 
