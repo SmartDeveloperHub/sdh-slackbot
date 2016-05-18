@@ -236,6 +236,10 @@ module.exports = function(bot, log) {
 
     var detectObjectType = function(obj) {
 
+        if(obj == null) {
+            return;
+        }
+
         for(var m = 0; m < mappings.length; ++m) {
             var objInfo = mappings[m];
 
@@ -271,7 +275,7 @@ module.exports = function(bot, log) {
     var genericObjectFormatter = function(err, response, cb) {
 
         if(err) {
-            cb(err);
+            return cb(err);
         }
 
         var attachments = [];
@@ -325,14 +329,16 @@ module.exports = function(bot, log) {
             //Detect the type of the object and get the mapping info
             typeInfo = detectObjectType(response);
 
-            formatted = formatObject(response, typeInfo);
-            if(formatted) {
-                attachments.push(formatted);
-                cb(null, {
-                    attachments: attachments
-                });
-            } else {
-                log.warn("Unknown object type")
+            if(typeInfo) {
+                formatted = formatObject(response, typeInfo);
+                if(formatted) {
+                    attachments.push(formatted);
+                    cb(null, {
+                        attachments: attachments
+                    });
+                } else {
+                    log.warn("Unknown object type")
+                }
             }
 
         }
