@@ -36,7 +36,7 @@ module.exports = function(core, log) {
     });
 
     var bot = controller.spawn({
-        token: SLACK_BOT_TOKEN
+        token: process.env.SLACK_BOT_TOKEN
     }).startRTM();
 
     var SlackSdhMerge = require('./utils/merge')(core, bot);

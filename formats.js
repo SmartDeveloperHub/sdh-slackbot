@@ -178,7 +178,7 @@ module.exports = function(bot, log) {
     ];
 
     var generateDashboardLink = function(env, dashboard) {
-        return SDH_DASHBOARD_URL + "?env=" + encodeURIComponent(JSON.stringify(env)) + "&dashboard=" + dashboard
+        return process.env.SDH_DASHBOARD_URL + "?env=" + encodeURIComponent(JSON.stringify(env)) + "&dashboard=" + dashboard
     };
 
     var createFormatFunction = function(formatter) {

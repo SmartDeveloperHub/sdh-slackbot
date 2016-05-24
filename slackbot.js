@@ -25,17 +25,15 @@ var slack = null;
 
 var init = function() {
 
-    try {
-        // Set Config params
-        require('./config');
-    } catch (err) {
-        console.error("Fatal BOT Error with config: " + err);
-        setTimeout(function() {
-            process.exit(0);
-        }, 1000);
-    }
+    // Load environment variables, either from .env files (development)
+    require('dotenv').load();
 
-    require('./utils/log')(FILE_LOG_PATH, FILE_LOG_LEVEL, FILE_LOG_PERIOD, FILE_LOG_NFILES).then(function (_log) {
+    require('./utils/log')(
+        process.env.FILE_LOG_PATH,
+        process.env.FILE_LOG_LEVEL,
+        parseInt(process.env.FILE_LOG_PERIOD),
+        parseInt(process.env.FILE_LOG_NFILES)
+    ).then(function (_log) {
         log = _log;
         startBOT();
     });
@@ -63,7 +61,7 @@ var startBOT = function startBOT () {
         log.warn("Something is wrong, but SDH will continue on line");
     });
 
-    if (!SLACK_BOT_TOKEN) {
+    if (!process.env.SLACK_BOT_TOKEN) {
         log.error('SLACK_BOT_TOKEN not found');
         gracefullyShuttingDown();
         return;
@@ -73,7 +71,14 @@ var startBOT = function startBOT () {
     var corelog = log.child({in: 'core'});
 
     // Load core
-    require('sdh-core-bot')("<@USLACKBOT>", SDH_API_URL, SDH_DASHBOARD_URL, SEARCH_URL, SDH_IMAGES_SERVICE, corelog).then(launchSlackBot);
+    require('sdh-core-bot')(
+        "<@USLACKBOT>",
+        process.env.SDH_API_URL,
+        process.env.SDH_DASHBOARD_URL,
+        process.env.SEARCH_URL,
+        process.env.SDH_IMAGES_SERVICE,
+        corelog
+    ).then(launchSlackBot);
 
 };
 
