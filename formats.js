@@ -177,6 +177,23 @@ module.exports = function(bot, log) {
         }
     ];
 
+    var callbackForOnlyData = function(cb, pending) {
+
+        return function(err, data) {
+
+            if(err) {
+                cb(err);
+                return;
+            }
+
+            cb(undefined, {
+                returned: data,
+                finished: (!pending || pending === 0),
+                pending: (!pending ? 0 : pending)
+            })
+        }
+    };
+
     var generateDashboardLink = function(env, dashboard) {
         return process.env.SDH_DASHBOARD_URL + "?env=" + encodeURIComponent(JSON.stringify(env)) + "&dashboard=" + dashboard
     };
@@ -292,7 +309,9 @@ module.exports = function(bot, log) {
                 typeInfo = detectObjectType(response[0]);
 
                 if(typeInfo && response.length > paginationSize && typeInfo.attachmentOptions != null && typeInfo.attachmentOptions.thumb_url != null) {
-                    cb(null, "There are a lot of images in the result, it may take some time for Slack to process them. Please be patient. :simple_smile:");
+                    callbackForOnlyData(cb, Math.ceil(response.length/paginationSize + 1))(
+                        null, "There are a lot of images in the result, it may take some time for Slack to process them. Please be patient. :simple_smile:"
+                    );
                 } else {
                     paginationSize = response.length; // Do not paginate if there is no images of there is not too many
                 }
@@ -311,11 +330,13 @@ module.exports = function(bot, log) {
                     }
 
                     // Send messages witha difference of 1 second from the previous one
-                    setTimeout(function(attachments) {
-                        cb(null, {
-                            attachments: attachments
-                        });
-                    }.bind(null, attachments), sent++ * 1000);
+                    setTimeout(function(attachments, r) {
+                        callbackForOnlyData(cb, Math.ceil((response.length - r)/paginationSize) )(
+                            null, {
+                                attachments: attachments
+                            }
+                        );
+                    }.bind(null, attachments, r), sent++ * 1000);
 
                     attachments = [];
                 }

@@ -52,6 +52,7 @@ module.exports = function(core, log) {
             SlackSdhMerge.replaceSlackIds(message.text).then(function(text) {
 
                 try {
+                    bot.startTyping(message);
                     core.handleMessage(text, function(err, coreResponse) {
                         if(err) {
                             if(!(err instanceof core.errors.InvalidArgument)) {
@@ -85,7 +86,15 @@ module.exports = function(core, log) {
 
     var genericSlackCallback = function genericSlackCallback(bot, message, coreResponse) {
 
-        bot.reply(message, coreResponse);
+        if(typeof coreResponse === 'object' && coreResponse.finished != null) {
+            bot.reply(message, coreResponse.returned);
+            if(!coreResponse.finished) {
+                bot.startTyping(message);
+            }
+        } else {
+            bot.reply(message, coreResponse);
+        }
+
 
     };
 
