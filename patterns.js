@@ -35,8 +35,85 @@ module.exports = function(core, bot, log) {
         }
     };
 
+    var help = function(callback) {
+        callback (null, {
+            'title': "Help Information",
+            'description': "This is the slack bot basic methods help information",
+            'attachments': [
+                {
+                    title: "give me all metrics",
+                    text: "Retrieve a list with all the metrics in SDH"
+                },
+                {
+                    title: "give me metrics about <text>",
+                    text: "Retrieve a list of metrics related with the text"
+                },
+                {
+                    title: "give me <text> metrics",
+                    text: "Retrieve a list of metrics related with the text"
+                },
+                {
+                    title: "give me [an image with] [<n_values> value[s]] [[with ]the {avg|max|sum} ][of ]metric <metric_id> [for <metric_param>] [from <from_date>] [until <to_date>]",
+                    text: "Obtain a metric. This metric can be visualized as an image. A range of dates can be specified as well as the number of values to obtain."
+                },
+                {
+                    title: "give me all views",
+                    text: "Retrieve a list with all the views in SDH."
+                },
+                {
+                    title: "give me views about <text>",
+                    text: "Retrieve a list of views related with the text."
+                },
+                {
+                    title: "give me <text> views",
+                    text: "Retrieve a list of views related with the text."
+                },
+                {
+                    title: "give me view <view_id> [for <metric_param>] [from <from_date>] [until <to_date>]",
+                    text: "Obtain a view. A range of dates can be specified."
+                },
+                {
+                    title: "give me all organizations",
+                    text: "Retrieve a list of the organizations."
+                },
+                {
+                    title: "give me all products",
+                    text: "Retrieve a list of the products."
+                },
+                {
+                    title: "give me all projects",
+                    text: "Retrieve a list of the projects."
+                },
+                {
+                    title: "give me all {users|members}",
+                    text: "Retrieve a list of the members."
+                },
+                {
+                    title: "give me all repos[itories]",
+                    text: "Retrieve a list of the repositories."
+                },
+                {
+                    title: "give me <text> product",
+                    text: "Retrieve information about an specific product. <text> does not need to be a product id, it can be a text that will be used to search with and the information of the best matching will be displayed."
+                },
+                {
+                    title: "give me <text> project",
+                    text: "Retrieve information about an specific proejct. <text> does not need to be a project id, it can be a text that will be used to search with and the information of the best matching will be displayed."
+                },
+                {
+                    title: "give me <text> {user|member}",
+                    text: "Retrieve information about an specific member. <text> does not need to be a product id, it can be a text that will be used to search with and the information of the best matching will be displayed."
+                },
+                {
+                    title: "give me <text> repo[sitory]",
+                    text: "Retrieve information about an specific repository. <text> does not need to be a repository id, it can be a text that will be used to search with and the information of the best matching will be displayed."
+                }
+            ]
+        });
+    };
+
     // Return core bot help information
-    core.registerDirective(/help/i, core.ops.helpme);
+    core.registerDirective(/help/i, help);
 
     // Return complete SDH metrics list
     core.registerDirective(/give me all metrics/i, f.formatMetricsInfo(core.ops.allMetrics));
