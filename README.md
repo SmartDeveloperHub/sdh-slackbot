@@ -15,3 +15,12 @@ SDH-slackBot is distributed under the Apache License, version 2.0.
 ```
 npm install sdh-slackbot
 ```
+
+## Configuration
+Set the environment variables or create a .env file with the variables defined in the ".env.example file".
+
+## Run
+Run SDH-SlackBot with:
+```
+node slackbot.js
+```
