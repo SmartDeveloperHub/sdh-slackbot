@@ -1,6 +1,6 @@
 {
   "name": "sdh-slackbot",
-  "version": "0.0.1-f",
+  "version": "0.0.1-g",
   "description": "Smart Developer Hub SlackBot",
   "license": "Apache-2.0",
   "contributors": [
@@ -34,5 +34,8 @@
     "dotenv": "^2.0.0",
     "mkdirp": "*",
     "sdh-core-bot": "*"
+  },
+  "scripts": {
+    "start": "node slackbot.js"
   }
 }
